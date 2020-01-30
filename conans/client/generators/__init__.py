@@ -81,6 +81,23 @@ def write_generators(conanfile, path, output):
         except KeyError:
             raise ConanException("Invalid generator '%s'. Available types: %s" %
                                  (generator_name, ", ".join(registered_generators.available)))
+        for dep_name in conanfile.deps_cpp_info.deps:
+            dep_cpp_info = conanfile.deps_cpp_info[dep_name]
+            changed = False
+            if len(dep_cpp_info.include_paths) == 0:
+                for includedir in dep_cpp_info.includedirs:
+                    if "include" == includedir:
+                        continue
+                    dep_cpp_info.include_paths.append(includedir)
+                    changed = True
+            if len(dep_cpp_info.lib_paths) == 0:
+                for libdir in dep_cpp_info.libdirs:
+                    if "lib" == libdir:
+                        continue
+                    dep_cpp_info.lib_paths.append(libdir)
+                    changed = True
+            if changed:
+                conanfile.deps_cpp_info.update(dep_cpp_info, dep_name)
         try:
             generator = generator_class(conanfile)
         except TypeError:
