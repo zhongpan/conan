@@ -59,7 +59,14 @@ class Lock(object):
 
     def _readers(self):
         try:
-            return int(load(self._count_file))
+            reader_cnt = load(self._count_file)
+            try:
+                reader_cnt = reader_cnt.decode("utf8").encode("gbk")
+            except:
+                pass
+            if not reader_cnt.isdigit():
+                reader_cnt = "0"
+            return int(reader_cnt)
         except IOError:
             return 0
 
