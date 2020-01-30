@@ -1,4 +1,4 @@
-import os
+import os, stat
 import fnmatch
 import shutil
 from collections import defaultdict
@@ -178,5 +178,6 @@ class FileCopier(object):
                 os.symlink(linkto, abs_dst_name)  # @UndefinedVariable
             else:
                 shutil.copy2(abs_src_name, abs_dst_name)
+                os.chmod(abs_dst_name, stat.S_IWRITE)
             copied_files.append(abs_dst_name)
         return copied_files
