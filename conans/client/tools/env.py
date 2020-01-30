@@ -39,7 +39,12 @@ def environment_append(env_vars):
     """
     for name, value in env_vars.items():
         if isinstance(value, list):
-            env_vars[name] = os.pathsep.join(value)
+            new = os.pathsep.join(value)
+            try:
+                new = new.decode("utf8").encode("gbk")
+            except:
+                pass
+            env_vars[name] = new
             old = os.environ.get(name)
             if old:
                 env_vars[name] += os.pathsep + old
