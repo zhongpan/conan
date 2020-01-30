@@ -1,4 +1,4 @@
-import os
+import os, sys
 from contextlib import contextmanager
 
 from conans import tools  # @UnusedImport KEEP THIS! Needed for pyinstaller to copy to exe.
@@ -182,11 +182,20 @@ class ConanFile(object):
         ret, multiple = tmp_env_values.env_dicts(self.name)
         ret.update(multiple)
         return ret
+        
+    @property
+    def default_channel(self):
+        channel_file = os.path.join(sys.path[0], "channel.txt")
+        if not os.path.exists(channel_file):
+            channel_file = os.path.join(sys.path[0], "..", "channel.txt")
+            if not os.path.exists(channel_file):
+                return None
+        return tools.load(channel_file)      
 
     @property
     def channel(self):
         if not self._channel:
-            self._channel = os.getenv("CONAN_CHANNEL")
+            self._channel = os.getenv("CONAN_CHANNEL") or self.default_channel
             if not self._channel:
                 raise ConanException("CONAN_CHANNEL environment variable not defined, "
                                      "but self.channel is used in conanfile")
