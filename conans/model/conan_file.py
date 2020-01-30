@@ -111,6 +111,7 @@ class ConanFile(object):
     build_policy = None
     short_paths = False
     apply_env = True  # Apply environment variables from requires deps_env_info and profiles
+    default_user = None
 
     def __init__(self, output, runner, settings, user=None, channel=None, local=None):
         # User defined generators
@@ -194,7 +195,7 @@ class ConanFile(object):
     @property
     def user(self):
         if not self._user:
-            self._user = os.getenv("CONAN_USERNAME")
+            self._user = os.getenv("CONAN_USERNAME") or self.default_user
             if not self._user:
                 raise ConanException("CONAN_USERNAME environment variable not defined, "
                                      "but self.user is used in conanfile")
