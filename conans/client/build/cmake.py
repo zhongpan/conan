@@ -439,6 +439,16 @@ class CMake(object):
             args_to_string(args)
         ])
         command = "cmake --build %s" % arg_list
+        if os.getenv("CONAN_WITH_IB") and self._arch:
+            msvc_arch = {'x86': 'Win32', 'x86_64': 'x64'}
+            cfg = "%s|%s" % (self._build_type, msvc_arch[str(self._arch)])
+            slnfile = ""
+            for file in os.listdir(build_dir):
+                filepath = os.path.join(build_dir, file)
+                if os.path.isfile(filepath) and filepath.endswith(".sln"):
+                    slnfile = filepath
+                    break
+            command = "BuildConsole %s /build \"%s\"" % (slnfile, cfg)      
         self._run(command)
 
     def install(self, args=None, build_dir=None):
